@@ -1,0 +1,59 @@
+import { useState } from 'react';
+import './App.css'
+import { peticion } from './funciones';
+import toast, { Toaster } from 'react-hot-toast';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import Asistente from './componentes/asistente';
+import TextoConEfecto from './componentes/respuesta';
+
+function App() {
+  const [prompt, setPrompt] = useState('');
+  const [respuesta, setRespuesta] = useState('');
+  const [load, setLoad] = useState(false);
+  const submit = ()=>{
+    if (prompt.trim() !== '') {
+        setLoad(true);
+        peticion('peticion', { prompt}, false)
+          .then((respuesta: any) => {
+            setRespuesta(respuesta);
+            setPrompt('');
+          })
+          .catch((err) => {
+            console.log(err);
+            toast.error('Error al enviar el mensaje');
+            setRespuesta('Error al enviar el mensaje');
+          })
+          .finally(()=> setLoad(false));
+    }
+  }
+  return (
+    <>
+    <main>
+      <section className='respuestas'>
+        <Asistente texto={respuesta} />
+        <TextoConEfecto respuesta={respuesta} />
+      </section>
+      <section className="chat">
+        <textarea value={prompt} onChange={(e)=>{setPrompt(e.target.value)}} placeholder='Escribe aquí tu mensaje...'></textarea>
+        <div className="enviar">
+          <p>{load ? 'Enviando...' : 'Envía tu mensaje'}</p>
+          <button onClick={submit} disabled={load}>
+            <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="icon icon-tabler icons-tabler-outline icon-tabler-send-2">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4.698 4.034l16.302 7.966l-16.302 7.966a.503 .503 0 0 1 -.546 -.124a.555 .555 0 0 1 -.12 -.568l2.468 -7.274l-2.468 -7.274a.555 .555 0 0 1 .12 -.568a.503 .503 0 0 1 .546 -.124" />
+              <path d="M6.5 12h14.5" />
+            </svg>
+          </button>
+        </div>
+      </section>
+      <footer>
+        Elaborado por <a href="https://andromedacrea.com" target="_blank" rel="noopener noreferrer">el Ing Jeison</a>
+      </footer>
+    </main>
+    <Toaster />
+    </>
+  )
+}
+
+export default App

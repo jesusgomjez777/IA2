@@ -1,0 +1,35 @@
+const url = import.meta.env.VITE_URL_BACKEND;
+
+
+export async function peticion(lugar: string, data?: any, file?: boolean) {
+    const parametros: RequestInit = {
+        method: 'POST'
+    };
+
+    if (!file) {
+        parametros.headers = {
+            'Content-Type': 'application/json',
+        };
+    }
+
+    if (data) {
+        if (file) {
+            parametros.body = data;
+        } else {
+            parametros.body = JSON.stringify(data);
+        }
+    }
+
+    try {
+        const consulta = await fetch(url + lugar, parametros);
+        if (!consulta.ok) {
+            throw new Error("Error en la consulta");
+        }
+
+        const respuesta = await consulta.text();
+
+        return respuesta;
+    } catch (error) {
+        console.log(error);
+    }
+}

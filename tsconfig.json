@@ -1,0 +1,36 @@
+import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
+interface Props {
+  respuesta: string;
+}
+
+export default function TextoConEfecto({ respuesta }: Props) {
+  const [textoVisible, setTextoVisible] = useState("");
+
+  useEffect(() => {
+    let index = 0;
+
+    setTextoVisible("");
+
+    const interval = setInterval(() => {
+      setTextoVisible(respuesta.slice(0, index + 1));
+      index++;
+
+      if (index >= respuesta.length) {
+        clearInterval(interval);
+      }
+    }, 15); // velocidad
+
+    return () => clearInterval(interval);
+  }, [respuesta]);
+
+  return (
+    <div className="texto">
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        {textoVisible}
+      </ReactMarkdown>
+    </div>
+  );
+}
